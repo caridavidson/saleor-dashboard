@@ -10,7 +10,6 @@ import SaveButtonBar from "@saleor/components/SaveButtonBar";
 import SeoForm from "@saleor/components/SeoForm";
 import VisibilityCard from "@saleor/components/VisibilityCard";
 import { ProductErrorFragment } from "@saleor/fragments/types/ProductErrorFragment";
-import useDateLocalize from "@saleor/hooks/useDateLocalize";
 import useFormset from "@saleor/hooks/useFormset";
 import useStateFromProps from "@saleor/hooks/useStateFromProps";
 import { sectionNames } from "@saleor/intl";
@@ -46,12 +45,14 @@ import ProductShipping from "../ProductShipping/ProductShipping";
 import ProductStocks, { ProductStockInput } from "../ProductStocks";
 
 interface FormData {
+  availableForPurchase: string;
   basePrice: number;
   publicationDate: string;
   category: string;
   collections: string[];
   chargeTaxes: boolean;
   description: RawDraftContentState;
+  isAvailable: boolean;
   isPublished: boolean;
   name: string;
   productType: string;
@@ -114,7 +115,6 @@ export const ProductCreatePage: React.FC<ProductCreatePageProps> = ({
   onSubmit
 }: ProductCreatePageProps) => {
   const intl = useIntl();
-  const localizeDate = useDateLocalize();
   // Form values
   const {
     change: changeAttributeData,
@@ -134,11 +134,13 @@ export const ProductCreatePage: React.FC<ProductCreatePageProps> = ({
     convertToRaw(ContentState.createFromText(""))
   );
   const initialData: FormData = {
+    availableForPurchase: "",
     basePrice: 0,
     category: "",
     chargeTaxes: false,
     collections: [],
     description: {} as any,
+    isAvailable: false,
     isPublished: false,
     name: "",
     productType: "",
@@ -325,25 +327,7 @@ export const ProductCreatePage: React.FC<ProductCreatePageProps> = ({
                   data={data}
                   errors={errors}
                   disabled={disabled}
-                  hiddenMessage={intl.formatMessage(
-                    {
-                      defaultMessage: "will be visible from {date}",
-                      description: "product"
-                    },
-                    {
-                      date: localizeDate(data.publicationDate)
-                    }
-                  )}
                   onChange={change}
-                  visibleMessage={intl.formatMessage(
-                    {
-                      defaultMessage: "since {date}",
-                      description: "product"
-                    },
-                    {
-                      date: localizeDate(data.publicationDate)
-                    }
-                  )}
                 />
               </div>
             </Grid>

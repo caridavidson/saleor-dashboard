@@ -41,6 +41,10 @@ import {
   ProductImageUpdate,
   ProductImageUpdateVariables
 } from "./types/ProductImageUpdate";
+import {
+  ProductSetAvailabilityForPurchase,
+  ProductSetAvailabilityForPurchaseVariables
+} from "./types/ProductSetAvailabilityForPurchase";
 import { ProductUpdate, ProductUpdateVariables } from "./types/ProductUpdate";
 import {
   ProductVariantBulkCreate,
@@ -589,3 +593,28 @@ export const useProductExport = makeMutation<
   ProductExport,
   ProductExportVariables
 >(productExportMutation);
+
+const productSetAvailabilityForPurchase = gql`
+  ${productErrorFragment}
+  mutation ProductSetAvailabilityForPurchase(
+    $isAvailable: Boolean!
+    $productId: ID!
+    $startDate: Date
+  ) {
+    productSetAvailabilityForPurchase(
+      isAvailable: $isAvailable
+      productId: $productId
+      startDate: $startDate
+    ) {
+      errors: productErrors {
+        ...ProductErrorFragment
+        message
+      }
+    }
+  }
+`;
+
+export const useProductSetAvailabilityForPurchase = makeMutation<
+  ProductSetAvailabilityForPurchase,
+  ProductSetAvailabilityForPurchaseVariables
+>(productSetAvailabilityForPurchase);

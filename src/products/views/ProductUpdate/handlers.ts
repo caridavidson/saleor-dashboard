@@ -3,6 +3,7 @@ import { ProductUpdatePageSubmitData } from "@saleor/products/components/Product
 import { ProductDetails_product } from "@saleor/products/types/ProductDetails";
 import { ProductImageCreateVariables } from "@saleor/products/types/ProductImageCreate";
 import { ProductImageReorderVariables } from "@saleor/products/types/ProductImageReorder";
+import { ProductSetAvailabilityForPurchaseVariables } from "@saleor/products/types/ProductSetAvailabilityForPurchase";
 import { ProductUpdateVariables } from "@saleor/products/types/ProductUpdate";
 import { SimpleProductUpdateVariables } from "@saleor/products/types/SimpleProductUpdate";
 import { mapFormsetStockToStockInput } from "@saleor/products/utils/data";
@@ -12,7 +13,10 @@ import { arrayMove } from "react-sortable-hoc";
 export function createUpdateHandler(
   product: ProductDetails_product,
   updateProduct: (variables: ProductUpdateVariables) => void,
-  updateSimpleProduct: (variables: SimpleProductUpdateVariables) => void
+  updateSimpleProduct: (variables: SimpleProductUpdateVariables) => void,
+  setProductAvailability: (options: {
+    variables: ProductSetAvailabilityForPurchaseVariables;
+  }) => void
 ) {
   return (data: ProductUpdatePageSubmitData) => {
     const productVariables: ProductUpdateVariables = {
@@ -26,7 +30,7 @@ export function createUpdateHandler(
       collections: data.collections,
       descriptionJson: JSON.stringify(data.description),
       id: product.id,
-      isPublished: data.isPublished,
+      isPublished: data.publicationDate ? true : data.isPublished,
       name: data.name,
       publicationDate:
         data.publicationDate !== "" ? data.publicationDate : null,
@@ -50,6 +54,20 @@ export function createUpdateHandler(
         },
         updateStocks: data.updateStocks.map(mapFormsetStockToStockInput),
         weight: weight(data.weight)
+      });
+    }
+    const { isAvailable, availableForPurchase } = data;
+    if (
+      isAvailable !== product.isAvailable ||
+      availableForPurchase !== product.availableForPurchase
+    ) {
+      setProductAvailability({
+        variables: {
+          isAvailable: data.availableForPurchase ? true : data.isAvailable,
+          productId: product.id,
+          startDate:
+            data.availableForPurchase !== "" ? data.availableForPurchase : null
+        }
       });
     }
   };

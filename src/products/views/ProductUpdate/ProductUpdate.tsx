@@ -11,6 +11,7 @@ import useNavigator from "@saleor/hooks/useNavigator";
 import useNotifier from "@saleor/hooks/useNotifier";
 import useShop from "@saleor/hooks/useShop";
 import { commonMessages } from "@saleor/intl";
+import { useProductSetAvailabilityForPurchase } from "@saleor/products/mutations";
 import useCategorySearch from "@saleor/searches/useCategorySearch";
 import useCollectionSearch from "@saleor/searches/useCollectionSearch";
 import createDialogActionHandlers from "@saleor/utils/handlers/dialogActionHandlers";
@@ -77,6 +78,24 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = ({ id, params }) => {
     }
   });
   const shop = useShop();
+
+  const [
+    setProductAvailability,
+    productAvailabilityOpts
+  ] = useProductSetAvailabilityForPurchase({
+    onCompleted: data => {
+      const errors = data?.productSetAvailabilityForPurchase?.errors;
+      if (errors?.length === 0) {
+        notify({
+          status: "success",
+          text: intl.formatMessage({
+            defaultMessage: "Availability updated",
+            description: "snackbar text"
+          })
+        });
+      }
+    }
+  });
 
   const [openModal, closeModal] = createDialogActionHandlers<
     ProductUrlDialog,
@@ -166,7 +185,8 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = ({ id, params }) => {
               const handleSubmit = createUpdateHandler(
                 product,
                 updateProduct.mutate,
-                updateSimpleProduct.mutate
+                updateSimpleProduct.mutate,
+                setProductAvailability
               );
               const handleImageUpload = createImageUploadHandler(
                 id,
@@ -182,6 +202,7 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = ({ id, params }) => {
                 deleteProduct.opts.loading ||
                 reorderProductImages.opts.loading ||
                 updateProduct.opts.loading ||
+                productAvailabilityOpts.loading ||
                 loading;
               const formTransitionState = getMutationState(
                 updateProduct.opts.called || updateSimpleProduct.opts.called,
@@ -202,6 +223,7 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = ({ id, params }) => {
                 () => searchCollectionsOpts.data.search.edges,
                 []
               ).map(edge => edge.node);
+
               const errors = [
                 ...maybe(
                   () => updateProduct.opts.data.productUpdate.errors,
@@ -210,7 +232,9 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = ({ id, params }) => {
                 ...maybe(
                   () => updateSimpleProduct.opts.data.productUpdate.errors,
                   []
-                )
+                ),
+                ...(productAvailabilityOpts?.data
+                  ?.productSetAvailabilityForPurchase?.errors || [])
               ];
 
               return (

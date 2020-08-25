@@ -173,6 +173,7 @@ export const productFragmentDetails = gql`
     weight {
       ...WeightFragment
     }
+    availableForPurchase
   }
 `;
 

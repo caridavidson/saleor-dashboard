@@ -159,15 +159,6 @@ const CollectionCreatePage: React.FC<CollectionCreatePageProps> = ({
                         }
                       )}
                       onChange={change}
-                      visibleMessage={intl.formatMessage(
-                        {
-                          defaultMessage: "since {date}",
-                          description: "collection"
-                        },
-                        {
-                          date: localizeDate(data.publicationDate)
-                        }
-                      )}
                     />
                   </CardContent>
                 </Card>

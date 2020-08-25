@@ -169,11 +169,13 @@ export function getChoices(nodes: Node[]): SingleAutocompleteChoiceType[] {
 }
 
 export interface ProductUpdatePageFormData {
+  availableForPurchase: string;
   basePrice: number;
   category: string | null;
   collections: string[];
   chargeTaxes: boolean;
   description: RawDraftContentState;
+  isAvailable: boolean;
   isPublished: boolean;
   name: string;
   publicationDate: string;
@@ -189,6 +191,7 @@ export function getProductUpdatePageFormData(
   variants: ProductDetails_product_variants[]
 ): ProductUpdatePageFormData {
   return {
+    availableForPurchase: product?.availableForPurchase,
     basePrice: maybe(() => product.variants[0].price.amount, 0),
     category: maybe(() => product.category.id, ""),
     chargeTaxes: maybe(() => product.chargeTaxes, false),
@@ -197,6 +200,7 @@ export function getProductUpdatePageFormData(
       []
     ),
     description: maybe(() => JSON.parse(product.descriptionJson)),
+    isAvailable: product?.isAvailable,
     isPublished: maybe(() => product.isPublished, false),
     name: maybe(() => product.name, ""),
     publicationDate: maybe(() => product.publicationDate, ""),
